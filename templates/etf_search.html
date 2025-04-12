@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ETF 除息資料查詢</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 700px;
+    }
+    h2 {
+      font-size: 28px;
+      color: #4CAF50;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 20px;
+      margin-bottom: 10px;
+      display: block;
+      font-weight: bold;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 25px;
+      font-size: 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .result-table {
+      margin-top: 30px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .result-table th, .result-table td {
+      padding: 12px;
+      border: 1px solid #ccc;
+    }
+    .result-table th {
+      background-color: #f0f0f0;
+    }
+    .error {
+      color: red;
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>ETF 除息資料查詢</h2>
+    <form method="post" action="/search?authenticated=true">
+      <label for="etf_code">輸入 ETF 代碼：</label>
+      <input type="text" id="etf_code" name="etf_code" required placeholder="例如：0050" value="{{ etf }}" />
+      <button type="submit">查詢</button>
+    </form>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    {% if result %}
+      <h3>ETF 代碼：{{ etf }}</h3>
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>除息日</th>
+            <th>除息前股價</th>
+            <th>配息金額</th>
+            <th>除息後股價</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in result %}
+            <tr>
+              <td>{{ row.ex_date }}</td>
+              <td>{{ row.before_price }}</td>
+              <td>{{ row.dividend }}</td>
+              <td>{{ row.after_price }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</body>
+</html>
