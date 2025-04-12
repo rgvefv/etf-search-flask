@@ -1,22 +1,26 @@
-# 使用更新版本的 python 映像
+# 使用官方 Python 基礎映像檔
 FROM python:3.10-slim
 
-# 設定工作目錄
+# 安裝 Chrome 與 ChromeDriver 以及必需工具
+RUN apt-get update && apt-get install -y \
+    chromium \
+    chromium-driver \
+    curl \
+    unzip \
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+# 環境變數（給 selenium 指 Chrome 位置）
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROMEDRIVER_BIN=/usr/bin/chromedriver
+ENV PATH=$PATH:/usr/bin
+
+# 建立 app 目錄並複製檔案
 WORKDIR /app
+COPY . /app
 
-# 複製 requirements.txt 並安裝依賴
-COPY requirements.txt /app/
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# 安裝 Python 套件
+RUN pip install --no-cache-dir -r requirements.txt
 
-# 複製剩餘的應用程式代碼
-COPY . /app/
-
-# 設定環境變數
-ENV FLASK_APP=app.py
-
-# 開放容器端口
-EXPOSE 5000
-
-# 啟動應用程式
-CMD ["flask", "run", "--host=0.0.0.0"]
+# 啟動 Flask app
+CMD ["python", "etf_search_server.py"]

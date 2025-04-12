@@ -52,9 +52,15 @@ def search_etf():
         etf = request.form["etf_code"].strip()
 
         # 使用正確的 chromedriver 路徑（支援打包）
-        chrome_driver_path = os.path.join(base_dir, "chromedriver.exe")
-
         chrome_options = Options()
+        chrome_options.binary_location = "/usr/bin/chromium"
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+
+        driver = webdriver.Chrome(options=chrome_options)
+
         chrome_options.add_argument("--headless")  # 隱藏瀏覽器視窗
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_argument("user-agent=Mozilla/5.0")
@@ -104,5 +110,8 @@ def search_etf():
     return render_template("etf_search.html", result=result, etf=etf, error=error)
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 5000))  # 默认是 5000，但 Render 会传入一个真正的端口
+    app.run(host="0.0.0.0", port=port, debug=True)
+
