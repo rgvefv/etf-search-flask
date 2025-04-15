@@ -1,34 +1,31 @@
+# 使用輕量版 Python 映像檔
 FROM python:3.10-slim
 
-# 安裝基本套件和 Chrome
+# 安裝 Chrome、ChromeDriver、以及必需工具
 RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
-    curl \
-    gnupg \
-    fonts-liberation \
-    libnss3 \
-    libxss1 \
-    libappindicator3-1 \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libgtk-3-0 \
-    ca-certificates \
     chromium \
-    chromium-driver && \
-    rm -rf /var/lib/apt/lists/*
+    chromium-driver \
+    curl \
+    unzip \
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
 
+# 環境變數（告訴 selenium chrome 的位置）
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMEDRIVER_BIN=/usr/bin/chromedriver
 ENV PATH=$PATH:/usr/bin
 
+# 設定工作目錄
 WORKDIR /app
+
+# 複製專案檔案
 COPY . /app
 
+# 安裝 Python 套件
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 啟動 Flask app 前
+# 開放 port（Railway 用）
 EXPOSE 5000
 
-CMD ["python", "etf_search_server.py"]
-
+# 使用 gunicorn 執行 Flask app
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:$PORT", "etf_search_server:app"]
