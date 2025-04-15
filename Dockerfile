@@ -1,45 +1,26 @@
 FROM python:3.10-slim
 
-# 安裝必要套件與 Chrome 依賴
+# 安裝基本套件和 Chrome
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
+    curl \
     gnupg \
-    ca-certificates \
     fonts-liberation \
+    libnss3 \
+    libxss1 \
     libappindicator3-1 \
     libasound2 \
     libatk-bridge2.0-0 \
-    libnspr4 \
-    libnss3 \
-    libxss1 \
-    libgbm1 \
-    libx11-xcb1 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxi6 \
-    libxtst6 \
-    xdg-utils \
-    --no-install-recommends && \
+    libgtk-3-0 \
+    ca-certificates \
+    chromium \
+    chromium-driver && \
     rm -rf /var/lib/apt/lists/*
 
-# 安裝 Chrome
-RUN apt-get update && \
-    wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
-    rm google-chrome-stable_current_amd64.deb
-
-# 安裝 ChromeDriver
-RUN CHROME_VERSION=$(google-chrome --version | grep -oP "\d+\.\d+\.\d+") && \
-    wget -q "https://chromedriver.storage.googleapis.com/$CHROME_VERSION/chromedriver_linux64.zip" && \
-    unzip chromedriver_linux64.zip && \
-    mv chromedriver /usr/bin/chromedriver && \
-    chmod +x /usr/bin/chromedriver && \
-    rm chromedriver_linux64.zip
-
-ENV CHROME_BIN=/usr/bin/google-chrome
+ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMEDRIVER_BIN=/usr/bin/chromedriver
+ENV PATH=$PATH:/usr/bin
 
 WORKDIR /app
 COPY . /app
