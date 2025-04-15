@@ -1,46 +1,48 @@
-# 使用官方 Python 基礎映像檔
 FROM python:3.10-slim
 
-# 安裝 Chrome、ChromeDriver 和 headless 所需的套件
+# 安裝必要工具與 Chrome
 RUN apt-get update && apt-get install -y \
-    chromium \
-    chromium-driver \
-    curl \
+    wget \
     unzip \
     gnupg \
+    ca-certificates \
     fonts-liberation \
     libappindicator3-1 \
     libasound2 \
     libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdbus-1-3 \
-    libgdk-pixbuf2.0-0 \
     libnspr4 \
     libnss3 \
+    libxss1 \
+    libgbm1 \
     libx11-xcb1 \
     libxcomposite1 \
+    libxcursor1 \
     libxdamage1 \
-    libxrandr2 \
-    libxss1 \
+    libxi6 \
     libxtst6 \
     xdg-utils \
-    libu2f-udev \
-    libvulkan1 \
-    libgbm1 \
-    && rm -rf /var/lib/apt/lists/*
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
 
-# 設定 Chrome 與 ChromeDriver 路徑
-ENV CHROME_BIN=/usr/bin/chromium
+# 安裝 Chrome
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt install -y ./google-chrome-stable_current_amd64.deb && \
+    rm google-chrome-stable_current_amd64.deb
+
+# 安裝 ChromeDriver
+RUN CHROME_VERSION=$(google-chrome --version | grep -oP "\d+\.\d+\.\d+") && \
+    wget -q "https://chromedriver.storage.googleapis.com/$CHROME_VERSION/chromedriver_linux64.zip" && \
+    unzip chromedriver_linux64.zip && \
+    mv chromedriver /usr/bin/chromedriver && \
+    chmod +x /usr/bin/chromedriver && \
+    rm chromedriver_linux64.zip
+
+ENV CHROME_BIN=/usr/bin/google-chrome
 ENV CHROMEDRIVER_BIN=/usr/bin/chromedriver
-ENV PATH=$PATH:/usr/bin
 
-# 建立 app 目錄並複製檔案
 WORKDIR /app
 COPY . /app
 
-# 安裝 Python 套件
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 啟動 Flask app
 CMD ["python", "etf_search_server.py"]
