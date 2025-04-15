@@ -28,4 +28,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 # 使用 gunicorn 執行 Flask app
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:$PORT", "etf_search_server:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "etf_search_server:app"]
+
