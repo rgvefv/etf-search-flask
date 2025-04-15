@@ -20,7 +20,6 @@ app = Flask(__name__, template_folder=template_dir)
 
 PASSWORD = "8888"  # 設定的密碼
 
-
 # 登入頁面
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -34,7 +33,6 @@ def login():
             return render_template("login.html", error=error)
     
     return render_template("login.html")
-
 
 # 查詢頁面
 @app.route("/search", methods=["GET", "POST"])
@@ -51,23 +49,19 @@ def search_etf():
     if request.method == "POST":
         etf = request.form["etf_code"].strip()
 
-        # 使用正確的 chromedriver 路徑（支援打包）
         chrome_options = Options()
         chrome_options.binary_location = "/usr/bin/chromium"
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-
-        driver = webdriver.Chrome(options=chrome_options)
-
-        chrome_options.add_argument("--headless")  # 隱藏瀏覽器視窗
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_argument("user-agent=Mozilla/5.0")
 
         try:
-            service = Service(chrome_driver_path)
+            service = Service("/usr/bin/chromedriver")  # Docker 裡 chromedriver 路徑
             driver = webdriver.Chrome(service=service, options=chrome_options)
+
             driver.get(f"https://www.wantgoo.com/stock/etf/{etf}/dividend-policy/ex-dividend")
             time.sleep(random.uniform(1, 2))
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -109,9 +103,7 @@ def search_etf():
 
     return render_template("etf_search.html", result=result, etf=etf, error=error)
 
-
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))  # 默认是 5000，但 Render 会传入一个真正的端口
     app.run(host="0.0.0.0", port=port, debug=True)
-
