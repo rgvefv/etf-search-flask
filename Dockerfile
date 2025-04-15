@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-# 安裝必要工具與 Chrome
+# 安裝必要套件與 Chrome 依賴
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
@@ -25,8 +25,9 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 # 安裝 Chrome
-RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt install -y ./google-chrome-stable_current_amd64.deb && \
+RUN apt-get update && \
+    wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
     rm google-chrome-stable_current_amd64.deb
 
 # 安裝 ChromeDriver
