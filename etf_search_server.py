@@ -65,6 +65,7 @@ def search_etf():
 
             driver.get(f"https://www.wantgoo.com/stock/etf/{etf}/dividend-policy/ex-dividend")
             time.sleep(random.uniform(1, 2))
+            print(driver.page_source)
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(random.uniform(0.5, 1.5))
 
