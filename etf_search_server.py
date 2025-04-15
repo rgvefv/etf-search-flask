@@ -59,6 +59,7 @@ def search_etf():
         chrome_options.add_argument("user-agent=Mozilla/5.0")
 
         try:
+            from selenium.webdriver.chrome.service import Service
             service = Service("/usr/bin/chromedriver")  # Docker 裡 chromedriver 路徑
             driver = webdriver.Chrome(service=service, options=chrome_options)
 
